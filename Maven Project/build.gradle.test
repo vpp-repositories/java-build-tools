@@ -6,19 +6,23 @@ task hello << {
     println 'Hello world!'
 }
 
+task hello2 << {
+    println 'Hello world2!'
+}
+
 task helloAgain(dependsOn : 'hello' ) << {
     println 'Hello helloAgain!'
 
-//    // groovy
-//    4.times {
-//        println it
-//    }
-//
-//    // java
-//    for(int i=0; i<4; i++){
-//        Date now = new Date();
-//        System.out.println(now);
-//    }
+    // groovy
+    4.times {
+        println it
+    }
+
+    // java
+    for(int i=0; i<4; i++){
+        Date now = new Date();
+        System.out.println(now);
+    }
 }
 
 helloAgain.doFirst {
@@ -29,7 +33,7 @@ helloAgain << {
     println 'extension of helloAgain'
 }
 
-//if (Math.random() < 0.5)
-//{
-//    helloAgain.dependsOn 'hello'
-//}
+if (Math.random() < 0.5)
+{
+    helloAgain.dependsOn 'hello2'
+}
