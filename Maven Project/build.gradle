@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'war'
+
+defaultTasks 'clean', 'deployToTomcat'
+
+repositories {
+    mavenCentral()
+}
+
+war {
+    archiveName = 'gradlewebapp.war'
+    webInf { from 'src/main/resources/application.xml' }
+}
+
+task deployToTomcat (type: Copy, dependsOn: 'war') {
+    from 'build/libs/gradlewebapp.war'
+    into '../tomcat/webapps'
+}
+
+dependencies {
+    compile 'junit:junit:3.8.1'
+    compile 'org.springframework:spring-webmvc:3.1.1.RELEASE'
+    compile 'javax.validation:validation-api:1.0.0.GA'
+    compile 'org.hibernate:hibernate-validator:4.3.1.Final'
+    compile 'javax.servlet:servlet-api:2.5'
+    compile 'com.lowagie:itext:2.1.7'
+    compile 'org.apache.poi:poi:3.9'
+
+    runtime 'org.springframework.webflow:spring-webflow:2.3.2.RELEASE'
+    runtime 'jstl:jstl:1.2'
+}

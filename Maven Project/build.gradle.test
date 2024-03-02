@@ -1,0 +1,35 @@
+import java.util.*;
+
+defaultTasks 'helloAgain'
+
+task hello << {
+    println 'Hello world!'
+}
+
+task helloAgain(dependsOn : 'hello' ) << {
+    println 'Hello helloAgain!'
+
+//    // groovy
+//    4.times {
+//        println it
+//    }
+//
+//    // java
+//    for(int i=0; i<4; i++){
+//        Date now = new Date();
+//        System.out.println(now);
+//    }
+}
+
+helloAgain.doFirst {
+    println 'before helloAgain'
+}
+
+helloAgain << {
+    println 'extension of helloAgain'
+}
+
+//if (Math.random() < 0.5)
+//{
+//    helloAgain.dependsOn 'hello'
+//}

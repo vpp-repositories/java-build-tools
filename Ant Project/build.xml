@@ -1,0 +1,114 @@
+<project name="myprojectname" default="run">
+
+    <property name="bin_dir" value="bin"/>
+    <property name="src_dir" value="src"/>
+    <property name="lib_dir" value="lib"/>
+    <property name="test_reports" value="reports"/>
+    <property name="doc_dir" value="docs"/>
+    <property name="client_classname" value="com.virtualpairprogrammers.client.SpringClient"/>
+    <property name="dist_dir" value="dist"/>
+    <property name="warfile" value="mywebapp"/>
+    <property name="html_dir" value="web"/>
+    <property name="webinf_dir" value="WEB-INF"/>
+    <property name="tomcat_dir" value="../tomcat/webapps"/>
+
+    <path id="compiler_path">
+        <fileset dir="${lib_dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="runtime_path">
+        <path refid="compiler_path"/>
+        <pathelement location="${bin_dir}"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${bin_dir}"/>
+        <delete dir="${test_reports}"/>
+        <delete dir="${doc_dir}"/>
+        <delete dir="${dist_dir}"/>
+    </target>
+
+    <target name="create_directories" depends="clean">
+        <mkdir dir="${bin_dir}"/>
+        <mkdir dir="${test_reports}"/>
+        <mkdir dir="${doc_dir}"/>
+        <mkdir dir="${dist_dir}"/>
+    </target>
+
+    <target name="compile" depends="create_directories">
+        <javac srcdir="${src_dir}" destdir="${bin_dir}" debug="true">
+            <classpath refid="compiler_path"/>
+        </javac>
+    </target>
+
+    <target name="run_tests" depends="compile">
+        <junit printsummary="on" failureproperty="junit.failure">
+            <classpath refid="runtime_path"/>
+
+            <batchtest todir="${test_reports}">
+                <formatter type="xml"/>
+
+                <fileset dir="${src_dir}">
+                    <include name="**/*Test*"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport>
+            <fileset dir="${test_reports}"/>
+            <report todir="${test_reports}"/>
+        </junitreport>
+        <fail if="junit.failure" message="Some unit tests have failed"/>
+    </target>
+
+    <target name="generate_docs" depends="compile">
+        <javadoc destdir="${doc_dir}">
+            <packageset dir="${src_dir}">
+                <include name="com/**"/>
+            </packageset>
+        </javadoc>
+    </target>
+
+    <target name="run" depends="generate_docs, run_tests">
+        <copy todir="${bin_dir}">
+            <fileset dir="${src_dir}">
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+        <java classname="${client_classname}">
+            <classpath refid="runtime_path"/>
+        </java>
+    </target>
+
+    <target name="deploy" depends="compile">
+        <war warfile="${dist_dir}/${warfile}.war" webxml="web.xml">
+            <fileset dir="${html_dir}"/>
+
+            <lib dir="${lib_dir}">
+                <exclude name="servlet-api.jar"/>
+            </lib>
+
+            <classes dir="${bin_dir}"/>
+
+            <classes dir="${webinf_dir}">
+                <include name="**/*.properties"/>
+            </classes>
+
+            <webinf dir="${webinf_dir}">
+                <exclude name="**/*.properties"/>
+            </webinf>
+
+            <webinf dir="${src_dir}">
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </webinf>
+        </war>
+
+        <copy file="${dist_dir}/${warfile}.war" todir="${tomcat_dir}"/>
+
+    </target>
+
+</project>
